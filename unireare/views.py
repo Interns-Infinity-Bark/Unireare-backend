@@ -643,6 +643,8 @@ def add_note(request):
                     }]
                 })
             note.price = form.cleaned_data['price']
+        subjects[0].note_amount += 1
+        subjects[0].save()
         note.save()
         return ajax('success', '添加成功')
     else:
@@ -675,6 +677,36 @@ def delete_note(request, pk):
         return ajax('error', '笔记不存在')
     if not notes[0].is_draft and not request.user.is_superuser:
         return ajax('error', '无权访问该页面')
+    notes[0].subject.note_amount -= 1
+    notes[0].subject.save()
     notes[0].defunct = True
     notes[0].save()
     return ajax('success', '删除成功')
+
+
+def add_comment(request):
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    form = AddCommentForm(request.POST)
+    if form.is_valid():
+        notes = Note.objects.filter(pk=form.cleaned_data['note'], defunct=False)
+        if len(notes) == 0:
+            return ajax('error', '笔记不存在')
+        comment = Comment(user=request.user, note=notes[0], content=form.cleaned_data['content'])
+        if form.cleaned_data['upp_comment'] and form.cleaned_data['rep_comment']:
+            upp_comments = Comment.objects.filter(pk=form.cleaned_data['upp_comment'], note=notes[0], upp_comment=None,
+                                                  rep_comment=None, defunct=False)
+            rep_comments = Comment.objects.filter(pk=form.cleaned_data['rep_comment'], note=notes[0], defunct=False)
+            if len(upp_comments) == 0 or len(rep_comments) == 0:
+                return ajax('error', '评论不存在')
+            if upp_comments[0] != rep_comments[0]:
+                if not rep_comments[0].upp_comment or rep_comments[0].upp_comment != upp_comments[0]:
+                    return ajax('error', '评论不存在')
+            comment.upp_comment = upp_comments[0]
+            comment.rep_comment = rep_comments[0]
+        if form.cleaned_data['upp_comment'] ^ form.cleaned_data['rep_comment']:
+            return ajax('error', '评论不存在')
+        comment.save()
+        return ajax('success', '评论成功')
+    else:
+        return ajax('error', '', form.errors.get_json_data())

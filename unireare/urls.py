@@ -34,4 +34,5 @@ urlpatterns = [
     path('add_note', views.add_note),  # POST 添加笔记/草稿
     path('modify_note/<int:pk>', views.modify_note),  # POST 修改特定笔记/草稿
     path('delete_note/<int:pk>', views.delete_note),  # GET 删除特定笔记(管理员)/草稿
+    path('add_comment', views.add_comment),  # POST 添加评论
 ]

@@ -162,3 +162,20 @@ class ModifyNoteForm(forms.Form):
         label='是否是草稿',
         required=False,
     )
+
+
+class AddCommentForm(forms.Form):
+    note = forms.IntegerField(
+        label='笔记',
+    )
+    upp_comment = forms.IntegerField(
+        label='上级回复',
+        required=False,
+    )
+    rep_comment = forms.IntegerField(
+        label='同级回复',
+        required=False,
+    )
+    content = forms.CharField(
+        label='内容',
+    )

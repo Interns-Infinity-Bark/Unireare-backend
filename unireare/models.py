@@ -205,10 +205,22 @@ class Note(models.Model):
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
+    upp_comment = models.ForeignKey('self', related_name='upper_comment', null=True, on_delete=models.CASCADE)
+    rep_comment = models.ForeignKey('self', related_name='reply_comment', null=True, on_delete=models.CASCADE)
     content = models.TextField('内容')
     added_at = models.DateTimeField('添加时间', auto_now_add=True)
     last_updated_at = models.DateTimeField('最后更新时间', auto_now=True)
     defunct = models.BooleanField('已弃用', default=False)
+
+    def to_dict(self):
+        return {
+            'user': self.user.to_dict(),
+            'upp_comment': self.upp_comment.id if self.upp_comment else 0,
+            'rep_comment': self.rep_comment.id if self.rep_comment else 0,
+            'content': self.content,
+            'add_at': self.added_at.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
 
 
 # 点赞
