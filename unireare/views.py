@@ -624,11 +624,12 @@ def add_note(request):
         if len(subjects) == 0:
             return ajax('error', '科目不存在')
         note = Note(user=request.user, subject=subjects[0], title=form.cleaned_data['title'],
-                    content=form.cleaned_data['content'], is_free=(form.cleaned_data['is_free'] == True))
+                    content=form.cleaned_data['content'])
         if form.cleaned_data['is_draft']:
             note.is_draft = True
-        print(form.cleaned_data['is_free'])
-        if not form.cleaned_data['is_free']:
+        if form.cleaned_data['is_free']:
+            note.is_free = True
+        else:
             if not form.cleaned_data['price']:
                 return ajax('error', '', {
                     'price': [{

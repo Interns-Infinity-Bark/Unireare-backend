@@ -138,6 +138,7 @@ class AddNoteForm(forms.Form):
     )
     is_free = forms.BooleanField(
         label='是否免费',
+        required=False,
     )
     price = forms.IntegerField(
         label='价格',

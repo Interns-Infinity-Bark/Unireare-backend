@@ -158,7 +158,7 @@ class Note(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     title = models.CharField('标题', max_length=64)
     content = models.TextField('内容')
-    is_free = models.BooleanField('是否免费')
+    is_free = models.BooleanField('是否免费', default=False)
     price = models.IntegerField('价格', null=True)
     is_draft = models.BooleanField('是否是草稿', default=False)
     reading_amount = models.IntegerField('阅读量', default=0)
