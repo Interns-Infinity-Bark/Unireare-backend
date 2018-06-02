@@ -316,9 +316,7 @@ def upload_image(request):
     for name, filename in request.FILES.items():
         img = Image(user=request.user, image=request.FILES[name])
         img.save()
-        return ajax('success', '上传成功', {
-            'image': settings.MEDIA_URL + img.image.name
-        })
+        return ajax('success', '上传成功', [settings.MEDIA_URL + img.image.name], {'errno': 0})
     return ajax('error', '', {
         'name': [{
             'message': '这个字段是必填项。',
