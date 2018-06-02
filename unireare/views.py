@@ -543,3 +543,44 @@ def delete_subject(request, pk):
     subjects[0].defunct = True
     subjects[0].save()
     return ajax('success', '删除成功')
+
+
+def note_list(request):
+    pass
+
+
+def note_view(request, pk):
+    pass
+
+
+def add_note(request):
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    form = AddNoteForm(request.POST)
+    if form.is_valid():
+        subjects = Subject.objects.filter(pk=form.cleaned_data['subject'], defunct=False)
+        if len(subjects) == 0:
+            return ajax('error', '科目不存在')
+        note = Note(user=request.user, subject=subjects[0], title=form.cleaned_data['title'],
+                    content=form.cleaned_data['content'], is_free=form.cleaned_data['is_free'])
+        if not note.is_free:
+            if not form.cleaned_data['price']:
+                return ajax('error', '', {
+                    'price': [{
+                        'message': '价格不能为空',
+                        'code': 'invalid',
+                    }]
+                })
+        note.price = form.cleaned_data['price']
+        note.save()
+        return ajax('success', '添加成功')
+    else:
+        return ajax('error', '', form.errors.get_json_data())
+
+
+def modify_note(request, pk):
+    pass
+
+
+def delete_note(request, pk):
+    pass

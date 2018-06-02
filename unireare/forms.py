@@ -122,3 +122,35 @@ class SubjectForm(forms.Form):
         label='科目名称',
         max_length=16,
     )
+
+
+class AddNoteForm(forms.Form):
+    subject = forms.IntegerField(
+        label='科目',
+    )
+    title = forms.CharField(
+        label='标题',
+        max_length=128,
+    )
+    content = forms.CharField(
+        label='内容',
+        min_length=300,
+    )
+    is_free = forms.BooleanField(
+        label='是否免费',
+    )
+    price = forms.IntegerField(
+        label='价格',
+        required=False,
+    )
+
+
+class ModifyNoteForm(forms.Form):
+    title = forms.CharField(
+        label='标题',
+        max_length=128,
+    )
+    content = forms.CharField(
+        label='内容',
+        min_length=300,
+    )
