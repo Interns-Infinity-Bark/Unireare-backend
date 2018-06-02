@@ -160,6 +160,7 @@ class Note(models.Model):
     content = models.TextField('内容')
     is_free = models.BooleanField('是否免费')
     price = models.IntegerField('价格', null=True)
+    is_draft = models.BooleanField('是否是草稿', default=False)
     reading_amount = models.IntegerField('阅读量', default=0)
     liking_amount = models.IntegerField('点赞量', default=0)
     collect_amount = models.IntegerField('收藏量', default=0)
@@ -167,6 +168,37 @@ class Note(models.Model):
     added_at = models.DateTimeField('添加时间', auto_now_add=True)
     last_updated_at = models.DateTimeField('最后更新时间', auto_now=True)
     defunct = models.BooleanField('已弃用', default=False)
+
+    def to_dict(self, lite=True):
+        if lite:
+            return {
+                'user': self.user.to_dict(),
+                'subject': self.subject.to_dict(),
+                'title': self.title,
+                'content': self.content[:100],
+                'is_free': self.is_free,
+                'price': self.price,
+                'reading_amount': self.reading_amount,
+                'liking_amount': self.liking_amount,
+                'collect_amount': self.collect_amount,
+                'purchase_amount': self.purchase_amount,
+                'added_at': self.added_at.strftime("%Y-%m-%d %H:%M:%S"),
+                'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
+        return {
+            'user': self.user.to_dict(),
+            'subject': self.subject.to_dict(),
+            'title': self.title,
+            'content': self.content,
+            'is_free': self.is_free,
+            'price': self.price,
+            'reading_amount': self.reading_amount,
+            'liking_amount': self.liking_amount,
+            'collect_amount': self.collect_amount,
+            'purchase_amount': self.purchase_amount,
+            'added_at': self.added_at.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
 
 
 # 评论

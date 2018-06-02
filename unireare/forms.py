@@ -143,6 +143,10 @@ class AddNoteForm(forms.Form):
         label='价格',
         required=False,
     )
+    is_draft = forms.BooleanField(
+        label='是否是草稿',
+        required=False,
+    )
 
 
 class ModifyNoteForm(forms.Form):
@@ -153,4 +157,8 @@ class ModifyNoteForm(forms.Form):
     content = forms.CharField(
         label='内容',
         min_length=300,
+    )
+    is_draft = forms.BooleanField(
+        label='是否是草稿',
+        required=False,
     )

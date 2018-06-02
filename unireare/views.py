@@ -538,11 +538,81 @@ def delete_subject(request, pk):
 
 
 def note_list(request):
-    pass
+    notes = Note.objects.filter(is_draft=False, defunct=False)
+    if request.GET.get('subject'):
+        subjects = Subject.objects.filter(pk=request.GET.get('subject'))
+        if len(subjects) == 0:
+            return ajax('error', '科目不存在')
+        notes = notes.filter(subject=subjects[0])
+    if request.GET.get('name'):
+        notes = notes.filter(name__icontains=request.GET.get('name'))
+    if request.GET.get('user'):
+        users = User.objects.filter(pk=request.GET.get('user'))
+        if len(users) == 0:
+            return ajax('error', '用户不存在')
+        notes = notes.filter(user=users[0])
+    if request.GET.get('page'):
+        try:
+            page = int(request.GET.get('page'))
+        except (TypeError, ValueError):
+            return ajax('error', '页码格式错误')
+        paginator = Paginator(notes, 10)
+        if page not in range(1, paginator.num_pages + 1):
+            return ajax('error', '页码范围错误')
+        notes = paginator.get_page(page)
+        return ajax('success', '', {
+            'page': page,
+            'num_pages': notes.paginator.num_pages,
+            'notes': [note.to_dict() for note in notes]
+        })
+    return ajax('success', '', {
+        'notes': [note.to_dict() for note in notes]
+    })
+
+
+def draft_list(request):
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    notes = Note.objects.filter(is_draft=True, defunct=False)
+    if request.GET.get('subject'):
+        subjects = Subject.objects.filter(pk=request.GET.get('subject'))
+        if len(subjects) == 0:
+            return ajax('error', '科目不存在')
+        notes = notes.filter(subject=subjects[0])
+    if request.GET.get('name'):
+        notes = notes.filter(name__icontains=request.GET.get('name'))
+    if request.GET.get('page'):
+        try:
+            page = int(request.GET.get('page'))
+        except (TypeError, ValueError):
+            return ajax('error', '页码格式错误')
+        paginator = Paginator(notes, 10)
+        if page not in range(1, paginator.num_pages + 1):
+            return ajax('error', '页码范围错误')
+        notes = paginator.get_page(page)
+        return ajax('success', '', {
+            'page': page,
+            'num_pages': notes.paginator.num_pages,
+            'notes': [note.to_dict() for note in notes]
+        })
+    return ajax('success', '', {
+        'notes': [note.to_dict() for note in notes]
+    })
 
 
 def note_view(request, pk):
-    pass
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    notes = Note.objects.filter(pk=pk, defunct=False)
+    if len(notes) == 0:
+        return ajax('error', '笔记不存在')
+    if not notes[0].is_free and not request.user.is_superuser:
+        purchases = Purchased.objects.filter(user=request.user, note=notes[0])
+        if len(purchases) == 0:
+            return ajax('error', '无权访问该页面')
+    notes[0].reading_amount += 1
+    notes[0].save()
+    return ajax('success', '', notes[0].to_dict(lite=False))
 
 
 def add_note(request):
@@ -555,11 +625,20 @@ def add_note(request):
             return ajax('error', '科目不存在')
         note = Note(user=request.user, subject=subjects[0], title=form.cleaned_data['title'],
                     content=form.cleaned_data['content'], is_free=form.cleaned_data['is_free'])
+        if form.cleaned_data['is_draft']:
+            note.is_draft = True
         if not note.is_free:
             if not form.cleaned_data['price']:
                 return ajax('error', '', {
                     'price': [{
                         'message': '价格不能为空',
+                        'code': 'invalid',
+                    }]
+                })
+            if form.cleaned_data['price'] <= 0:
+                return ajax('error', '', {
+                    'price': [{
+                        'message': '价格必须为正数',
                         'code': 'invalid',
                     }]
                 })
@@ -589,11 +668,13 @@ def modify_note(request, pk):
 
 
 def delete_note(request, pk):
-    if not request.user.is_superuser:
-        return ajax('error', '无权访问该页面')
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
     notes = Note.objects.filter(pk=pk, defunct=False)
     if len(notes) == 0:
         return ajax('error', '笔记不存在')
+    if not notes[0].is_draft and not request.user.is_superuser:
+        return ajax('error', '无权访问该页面')
     notes[0].defunct = True
     notes[0].save()
     return ajax('success', '删除成功')

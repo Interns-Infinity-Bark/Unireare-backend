@@ -29,8 +29,9 @@ urlpatterns = [
     path('modify_subject/<int:pk>', views.modify_subject),  # POST 修改特定科目名称(管理员)
     path('delete_subject/<int:pk>', views.delete_subject),  # GET 删除特定科目(管理员)
     path('note_list', views.note_list),  # GET 获取笔记列表 可选参数: subject(int), name(str), user(int), page(int)
+    path('draft_list', views.draft_list),  # GET 获取草稿列表 可选参数: subject(int), name(str), page(int)
     path('note/<int:pk>', views.note_view),  # GET 查看笔记详情
-    path('add_note', views.add_note),  # POST 添加笔记
-    path('modify_note/<int:pk>', views.modify_note),  # POST 修改特定笔记(上传者或管理员)
-    path('delete_note/<int:pk>', views.delete_note),  # GET 删除特定笔记(管理员)
+    path('add_note', views.add_note),  # POST 添加笔记/草稿
+    path('modify_note/<int:pk>', views.modify_note),  # POST 修改特定笔记/草稿
+    path('delete_note/<int:pk>', views.delete_note),  # GET 删除特定笔记(管理员)/草稿
 ]
