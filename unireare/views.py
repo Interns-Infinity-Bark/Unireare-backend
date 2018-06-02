@@ -571,7 +571,7 @@ def add_note(request):
                         'code': 'invalid',
                     }]
                 })
-        note.price = form.cleaned_data['price']
+            note.price = form.cleaned_data['price']
         note.save()
         return ajax('success', '添加成功')
     else:
