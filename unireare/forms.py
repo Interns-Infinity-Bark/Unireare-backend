@@ -103,7 +103,8 @@ class UploadAvatarForm(forms.Form):
 
 
 class UploadImageForm(forms.Form):
-    name = forms.ImageField()
+    name = forms.CharField(),
+    # filename = forms.ImageField(required=False)
 
 
 class MessageForm(forms.Form):
