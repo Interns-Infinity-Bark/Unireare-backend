@@ -146,8 +146,9 @@ class Subject(models.Model):
         return {
             'id': self.id,
             'name': self.name,
+            'note_amount': self.note_amount,
             'added_at': self.added_at.strftime("%Y-%m-%d %H:%M:%S"),
-            'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S")
         }
 
 

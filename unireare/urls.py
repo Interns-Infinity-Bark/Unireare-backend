@@ -3,7 +3,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index),  # GET 首页
     path('login', views.user_login),  # POST 登录
     path('logout', views.user_logout),  # GET 注销
     path('session', views.session),  # GET 获取在线状态以及个人信息

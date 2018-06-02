@@ -38,15 +38,6 @@ def ajax(status, msg, data=None, extra=None):
     return json_resp
 
 
-def index(request):
-    pass
-    return ajax('success', '', {
-        'title': 'bLue',
-        'content': 'UMR',
-        'text': 'Ninaye'
-    })
-
-
 def user_login(request):
     if request.user.is_authenticated:
         return ajax('error', '已登录')
@@ -579,8 +570,29 @@ def add_note(request):
 
 
 def modify_note(request, pk):
-    pass
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    form = ModifyNoteForm(request.POST)
+    if form.is_valid():
+        notes = Note.objects.filter(pk=pk, defunct=False)
+        if len(notes) == 0:
+            return ajax('error', '笔记不存在')
+        if notes[0].user != request.user and not request.user.is_superuser:
+            return ajax('error', '无权访问该页面')
+        notes[0].title = form.cleaned_data['title']
+        notes[0].content = form.cleaned_data['content']
+        notes[0].save()
+        return ajax('success', '修改成功')
+    else:
+        return ajax('error', '', form.errors.get_json_data())
 
 
 def delete_note(request, pk):
-    pass
+    if not request.user.is_superuser:
+        return ajax('error', '无权访问该页面')
+    notes = Note.objects.filter(pk=pk, defunct=False)
+    if len(notes) == 0:
+        return ajax('error', '笔记不存在')
+    notes[0].defunct = True
+    notes[0].save()
+    return ajax('success', '删除成功')
