@@ -158,7 +158,7 @@ class Note(models.Model):
     title = models.CharField('标题', max_length=64)
     content = models.TextField('内容')
     is_free = models.BooleanField('是否免费')
-    price = models.IntegerField('价格')
+    price = models.IntegerField('价格', null=True)
     reading_amount = models.IntegerField('阅读量', default=0)
     liking_amount = models.IntegerField('点赞量', default=0)
     collect_amount = models.IntegerField('收藏量', default=0)
