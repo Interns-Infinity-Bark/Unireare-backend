@@ -299,7 +299,7 @@ def modify_password(request):
 def upload_avatar(request):
     if not request.user.is_authenticated:
         return ajax('error', '请先登录')
-    form = UploadAvatarForm(request.POST, request.FILES)
+    form = UploadImageForm(request.POST, request.FILES)
     if form.is_valid():
         request.user.avatar = request.FILES['image']
         request.user.save()
@@ -313,15 +313,18 @@ def upload_avatar(request):
 def upload_image(request):
     if not request.user.is_authenticated:
         return ajax('error', '请先登录')
-    form = UploadImageForm(request.POST, request.FILES)
-    if form.is_valid():
-        img = Image(user=request.user, image=request.FILES['name'])
+    for name, filename in request.FILES.items():
+        img = Image(user=request.user, image=request.FILES[name])
         img.save()
         return ajax('success', '上传成功', {
             'image': settings.MEDIA_URL + img.image.name
         })
-    else:
-        return ajax('error', '', form.errors.get_json_data())
+    return ajax('error', '', {
+        'name': [{
+            'message': '这个字段是必填项。',
+            'code': 'required',
+        }]
+    })
 
 
 def send_message(request):

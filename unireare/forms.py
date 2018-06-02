@@ -98,13 +98,8 @@ class ModifyPasswordForm(forms.Form):
     )
 
 
-class UploadAvatarForm(forms.Form):
-    image = forms.ImageField()
-
-
 class UploadImageForm(forms.Form):
-    name = forms.CharField(),
-    # filename = forms.ImageField(required=False)
+    image = forms.ImageField()
 
 
 class MessageForm(forms.Form):
