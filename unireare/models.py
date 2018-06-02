@@ -38,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     follower_amount = models.IntegerField('粉丝量', default=0)
     avatar = models.ImageField('头像', upload_to=PathAndRename('avatars'), null=True, blank=True)
     registered_at = models.DateTimeField('注册时间', auto_now_add=True)
-    is_active = models.BooleanField('有效用户', default=True)
+    is_active = models.BooleanField('是否激活', default=True)
 
     objects = UserManager()
 
@@ -62,12 +62,12 @@ class User(AbstractBaseUser, PermissionsMixin):
                 'nickname': self.nickname,
                 'school': self.school,
                 'major': self.major,
-                'tel': self.tel,
                 'motto': self.motto,
                 'following_amount': self.following_amount,
                 'follower_amount': self.follower_amount,
                 'is_vip': self.is_vip,
                 'avatar': settings.MEDIA_URL + (self.avatar.name if self.avatar.name else 'avatars/default.png'),
+                'registered_at': self.registered_at.strftime("%Y-%m-%d %H:%M:%S")
             }
         return {
             'id': self.pk,
@@ -84,7 +84,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             'is_vip': self.is_vip,
             'is_superuser': self.is_superuser,
             'avatar': settings.MEDIA_URL + (self.avatar.name if self.avatar.name else 'avatars/default.png'),
-            'registered_at': self.registered_at.strftime("%Y-%m-%d %H:%M:%S"),
+            'registered_at': self.registered_at.strftime("%Y-%m-%d %H:%M:%S")
         }
 
 
