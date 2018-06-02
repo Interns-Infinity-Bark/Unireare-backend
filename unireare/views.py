@@ -627,7 +627,8 @@ def add_note(request):
                     content=form.cleaned_data['content'], is_free=form.cleaned_data['is_free'])
         if form.cleaned_data['is_draft']:
             note.is_draft = True
-        if not note.is_free:
+        print(form.cleaned_data['is_free'])
+        if not note.form.cleaned_data['is_free']:
             if not form.cleaned_data['price']:
                 return ajax('error', '', {
                     'price': [{
