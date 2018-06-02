@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+__pycache__
+migrations
+
+venv
+static
+media
+
+/unireare_backend/settings.py
