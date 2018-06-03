@@ -610,9 +610,18 @@ def note_view(request, pk):
         purchases = Purchased.objects.filter(user=request.user, note=notes[0])
         if len(purchases) == 0:
             return ajax('error', '无权访问该页面')
+    comments = Comment.objects.filter(note=pk, defunct=False)
+    for comment in comments:
+        if comment.upp_comment and comment.upp_comment.defunct:
+            comment.defunct = True
+            comment.save()
+    comments = comments.filter(defunct=False)
     notes[0].reading_amount += 1
     notes[0].save()
-    return ajax('success', '', notes[0].to_dict(lite=False))
+    return ajax('success', '', {
+        'note': notes[0].to_dict(lite=False),
+        'comments': [comment.to_dict() for comment in comments]
+    })
 
 
 def add_note(request):
@@ -684,41 +693,6 @@ def delete_note(request, pk):
     notes[0].defunct = True
     notes[0].save()
     return ajax('success', '删除成功')
-
-
-def comment_list(request, node):
-    if not request.user.is_authenticated:
-        return ajax('error', '请先登录')
-    comments = Comment.objects.filter(note=node, defunct=False)
-    if len(comments) > 0:
-        if not comments[0].note.is_free and not request.user.is_superuser:
-            purchases = Purchased.objects.filter(user=request.user, note=comments[0].note)
-            if len(purchases) == 0:
-                return ajax('error', '无权访问该页面')
-        if comments[0].note.defunct or comments[0].note.subject.defunct:
-            return ajax('error', '评论不存在')
-    for comment in comments:
-        if comment.upp_comment and comment.upp_comment.defunct:
-            comment.defunct = True
-            comment.save()
-    comments = comments.filter(defunct=False)
-    if request.GET.get('page'):
-        try:
-            page = int(request.GET.get('page'))
-        except (TypeError, ValueError):
-            return ajax('error', '页码格式错误')
-        paginator = Paginator(comments, 10)
-        if page not in range(1, paginator.num_pages + 1):
-            return ajax('error', '页码范围错误')
-        comments = paginator.get_page(page)
-        return ajax('success', '', {
-            'page': page,
-            'num_pages': comments.paginator.num_pages,
-            'comments': [comment.to_dict() for comment in comments]
-        })
-    return ajax('success', '', {
-        'comments': [comment.to_dict() for comment in comments]
-    })
 
 
 def comment_view(request, pk):

@@ -34,9 +34,8 @@ urlpatterns = [
     path('add_note', views.add_note),  # POST 添加笔记/草稿
     path('modify_note/<int:pk>', views.modify_note),  # POST 修改特定笔记/草稿
     path('delete_note/<int:pk>', views.delete_note),  # GET 删除特定笔记(管理员)/草稿
-    path('comment_list/<int:node>', views.comment_list),  # GET 获取指定笔记的评论列表 可选参数: page(int)
-    path('comment/<int:pk>', views.comment_view),  # GET 查看评论
+    path('comment/<int:pk>', views.comment_view),  # GET 查看特定评论
     path('add_comment', views.add_comment),  # POST 添加评论
-    path('modify_comment/<int:pk>', views.modify_comment),  # POST 修改评论(评论者/管理员)
-    path('delete_comment/<int:pk>', views.delete_comment),  # GET 删除评论(评论者/管理员)
+    path('modify_comment/<int:pk>', views.modify_comment),  # POST 修改特定评论(评论者/管理员)
+    path('delete_comment/<int:pk>', views.delete_comment),  # GET 删除特定评论(评论者/管理员)
 ]
