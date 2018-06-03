@@ -171,11 +171,9 @@ class AddCommentForm(forms.Form):
     )
     upp_comment = forms.IntegerField(
         label='上级回复',
-        required=False,
     )
     rep_comment = forms.IntegerField(
         label='同级回复',
-        required=False,
     )
     content = forms.CharField(
         label='内容',

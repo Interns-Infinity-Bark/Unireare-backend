@@ -161,6 +161,7 @@ class Note(models.Model):
     is_free = models.BooleanField('是否免费', default=False)
     price = models.IntegerField('价格', null=True)
     is_draft = models.BooleanField('是否是草稿', default=False)
+    comment_amount = models.IntegerField('评论量', default=0)
     reading_amount = models.IntegerField('阅读量', default=0)
     liking_amount = models.IntegerField('点赞量', default=0)
     collect_amount = models.IntegerField('收藏量', default=0)
@@ -179,6 +180,7 @@ class Note(models.Model):
                 'is_free': self.is_free,
                 'price': self.price,
                 'is_draft': self.is_draft,
+                'comment_amount': self.comment_amount,
                 'reading_amount': self.reading_amount,
                 'liking_amount': self.liking_amount,
                 'collect_amount': self.collect_amount,
@@ -194,6 +196,7 @@ class Note(models.Model):
             'is_free': self.is_free,
             'price': self.price,
             'is_draft': self.is_draft,
+            'comment_amount': self.comment_amount,
             'reading_amount': self.reading_amount,
             'liking_amount': self.liking_amount,
             'collect_amount': self.collect_amount,

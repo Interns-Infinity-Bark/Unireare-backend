@@ -691,7 +691,7 @@ def add_comment(request):
         return ajax('error', '请先登录')
     form = AddCommentForm(request.POST)
     if form.is_valid():
-        notes = Note.objects.filter(pk=form.cleaned_data['note'], defunct=False)
+        notes = Note.objects.filter(pk=form.cleaned_data['note'], is_draft=False, defunct=False)
         if len(notes) == 0:
             return ajax('error', '笔记不存在')
         comment = Comment(user=request.user, note=notes[0], content=form.cleaned_data['content'])
@@ -706,8 +706,11 @@ def add_comment(request):
                     return ajax('error', '评论不存在')
             comment.upp_comment = upp_comments[0]
             comment.rep_comment = rep_comments[0]
-        if form.cleaned_data['upp_comment'] ^ form.cleaned_data['rep_comment']:
+        elif (form.cleaned_data['upp_comment'] and not form.cleaned_data['rep_comment']) or (
+                not form.cleaned_data['upp_comment'] and form.cleaned_data['rep_comment']):
             return ajax('error', '评论不存在')
+        notes[0].comment_amount += 1
+        notes[0].save()
         comment.save()
         return ajax('success', '评论成功')
     else:
