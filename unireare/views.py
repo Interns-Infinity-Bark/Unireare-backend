@@ -696,8 +696,8 @@ def add_comment(request):
             return ajax('error', '笔记不存在')
         comment = Comment(user=request.user, note=notes[0], content=form.cleaned_data['content'])
         if form.cleaned_data['upp_comment'] and form.cleaned_data['rep_comment']:
-            upp_comments = Comment.objects.filter(pk=form.cleaned_data['upp_comment'], note=notes[0], upp_comment=None,
-                                                  rep_comment=None, defunct=False)
+            upp_comments = Comment.objects.filter(pk=form.cleaned_data['upp_comment'], note=notes[0],
+                                                  upp_comment__isnull=True, rep_comment__isnull=True, defunct=False)
             rep_comments = Comment.objects.filter(pk=form.cleaned_data['rep_comment'], note=notes[0], defunct=False)
             if len(upp_comments) == 0 or len(rep_comments) == 0:
                 return ajax('error', '评论不存在')
