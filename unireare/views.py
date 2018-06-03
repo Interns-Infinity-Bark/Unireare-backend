@@ -573,7 +573,7 @@ def note_list(request):
 def draft_list(request):
     if not request.user.is_authenticated:
         return ajax('error', '请先登录')
-    notes = Note.objects.filter(is_draft=True, defunct=False).order_by('-last_updated_at')
+    notes = Note.objects.filter(user=request.user, is_draft=True, defunct=False).order_by('-last_updated_at')
     if request.GET.get('subject'):
         subjects = Subject.objects.filter(pk=request.GET.get('subject'))
         if len(subjects) == 0:
