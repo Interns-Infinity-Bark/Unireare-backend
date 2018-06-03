@@ -19,7 +19,7 @@ urlpatterns = [
     path('upload_avatar', views.upload_avatar),  # POST 上传头像
     path('upload_image', views.upload_image),  # POST 上传图片
     path('send_message', views.send_message),  # POST 发送站内信
-    path('message_list', views.message_list),  # GET 站内信列表 可选参数: page(int)
+    path('message_list', views.message_list),  # GET 获取站内信列表 可选参数: page(int)
     path('message/<int:pk>', views.message_view),  # GET 站内信详情
     path('follow', views.follow),  # POST 关注/取消关注
     path('following', views.following),  # GET 我关注的 可选参数: page(int)
@@ -34,6 +34,7 @@ urlpatterns = [
     path('add_note', views.add_note),  # POST 添加笔记/草稿
     path('modify_note/<int:pk>', views.modify_note),  # POST 修改特定笔记/草稿
     path('delete_note/<int:pk>', views.delete_note),  # GET 删除特定笔记(管理员)/草稿
+    path('comment_list/<int:node>', views.comment_list),  # GET 获取评论列表 可选参数: page(int)
     path('comment/<int:pk>', views.comment_view),  # GET 查看评论
     path('add_comment', views.add_comment),  # POST 添加评论
     path('modify_comment/<int:pk>', views.modify_comment),  # POST 修改评论(评论者/管理员)
