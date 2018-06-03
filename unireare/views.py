@@ -686,6 +686,20 @@ def delete_note(request, pk):
     return ajax('success', '删除成功')
 
 
+def comment_view(request, pk):
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    comments = Comment.objects.filter(pk=pk, defunct=False)
+    if len(comments) == 0 or comments[0].note.defunct or (
+            comments[0].upp_comment and comments[0].upp_comment.defunct) or comments[0].note.subject.defunct:
+        return ajax('error', '评论不存在')
+    if not comments[0].note.is_free and not request.user.is_superuser:
+        purchases = Purchased.objects.filter(user=request.user, note=comments[0].note)
+        if len(purchases) == 0:
+            return ajax('error', '无权访问该页面')
+    return ajax('success', '', comments[0].to_dict())
+
+
 def add_comment(request):
     if not request.user.is_authenticated:
         return ajax('error', '请先登录')
@@ -744,8 +758,9 @@ def delete_comment(request, pk):
     if not request.user.is_authenticated:
         return ajax('error', '请先登录')
     comments = Comment.objects.filter(pk=pk, defunct=False)
-    if len(comments) == 0 or comments[0].note.defunct or comments[0].note.subject.defunct:
-        return ajax('error', '笔记不存在')
+    if len(comments) == 0 or comments[0].note.defunct or (
+            comments[0].upp_comment and comments[0].upp_comment.defunct) or comments[0].note.subject.defunct:
+        return ajax('error', '评论不存在')
     if not comments[0].user == request.user and not request.user.is_superuser:
         return ajax('error', '无权访问该页面')
     comments[0].note.comment_amount -= 1

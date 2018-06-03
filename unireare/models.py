@@ -232,13 +232,6 @@ class Comment(models.Model):
         }
 
 
-# 点赞
-class Liked(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    note = models.ForeignKey(Note, on_delete=models.CASCADE)
-    liked_at = models.DateTimeField('点赞时间', auto_now_add=True)
-
-
 # 收藏
 class Collection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
