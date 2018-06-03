@@ -604,7 +604,7 @@ def note_view(request, pk):
     if not request.user.is_authenticated:
         return ajax('error', '请先登录')
     notes = Note.objects.filter(pk=pk, defunct=False)
-    if len(notes) == 0:
+    if len(notes) == 0 or notes[0].subject.defunct:
         return ajax('error', '笔记不存在')
     if not notes[0].is_free and not request.user.is_superuser:
         purchases = Purchased.objects.filter(user=request.user, note=notes[0])
@@ -659,7 +659,7 @@ def modify_note(request, pk):
     form = ModifyNoteForm(request.POST)
     if form.is_valid():
         notes = Note.objects.filter(pk=pk, defunct=False)
-        if len(notes) == 0:
+        if len(notes) == 0 or notes[0].subject.defunct:
             return ajax('error', '笔记不存在')
         if notes[0].user != request.user and not request.user.is_superuser:
             return ajax('error', '无权访问该页面')
@@ -675,7 +675,7 @@ def delete_note(request, pk):
     if not request.user.is_authenticated:
         return ajax('error', '请先登录')
     notes = Note.objects.filter(pk=pk, defunct=False)
-    if len(notes) == 0:
+    if len(notes) == 0 or notes[0].subject.defunct:
         return ajax('error', '笔记不存在')
     if not notes[0].is_draft and not request.user.is_superuser:
         return ajax('error', '无权访问该页面')
@@ -703,7 +703,8 @@ def add_comment(request):
             upp_comments = Comment.objects.filter(pk=form.cleaned_data['upp_comment'], note=notes[0],
                                                   upp_comment__isnull=True, rep_comment__isnull=True, defunct=False)
             rep_comments = Comment.objects.filter(pk=form.cleaned_data['rep_comment'], note=notes[0], defunct=False)
-            if len(upp_comments) == 0 or len(rep_comments) == 0:
+            if len(upp_comments) == 0 or upp_comments[0].note.defunct or upp_comments[0].note.subject.defunct or len(
+                    rep_comments) == 0:
                 return ajax('error', '评论不存在')
             if upp_comments[0] != rep_comments[0]:
                 if not rep_comments[0].upp_comment or rep_comments[0].upp_comment != upp_comments[0]:
@@ -737,3 +738,18 @@ def modify_comment(request, pk):
         return ajax('success', '修改成功')
     else:
         return ajax('error', '', form.errors.get_json_data())
+
+
+def delete_comment(request, pk):
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    comments = Comment.objects.filter(pk=pk, defunct=False)
+    if len(comments) == 0 or comments[0].note.defunct or comments[0].note.subject.defunct:
+        return ajax('error', '笔记不存在')
+    if not comments[0].user == request.user and not request.user.is_superuser:
+        return ajax('error', '无权访问该页面')
+    comments[0].note.comment_amount -= 1
+    comments[0].note.save()
+    comments[0].defunct = True
+    comments[0].save()
+    return ajax('success', '删除成功')
