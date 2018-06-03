@@ -219,13 +219,22 @@ class Comment(models.Model):
     last_updated_at = models.DateTimeField('最后更新时间', auto_now=True)
     defunct = models.BooleanField('已弃用', default=False)
 
-    def to_dict(self):
+    def to_dict(self, lite=False):
+        if lite:
+            return {
+                'id': self.id,
+                'user': self.user.to_dict(),
+                'note': self.note.id,
+                'content': self.content,
+                'add_at': self.added_at.strftime("%Y-%m-%d %H:%M:%S"),
+                'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S")
+            }
         return {
             'id': self.id,
             'user': self.user.to_dict(),
             'note': self.note.id,
-            'upp_comment': self.upp_comment.id if self.upp_comment else 0,
-            'rep_comment': self.rep_comment.id if self.rep_comment else 0,
+            'upp_comment': self.upp_comment.to_dict(lite=True) if self.upp_comment else None,
+            'rep_comment': self.rep_comment.to_dict(lite=True) if self.rep_comment else None,
             'content': self.content,
             'add_at': self.added_at.strftime("%Y-%m-%d %H:%M:%S"),
             'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S")
