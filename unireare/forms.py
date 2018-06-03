@@ -178,3 +178,9 @@ class AddCommentForm(forms.Form):
     content = forms.CharField(
         label='内容',
     )
+
+
+class ModifyCommentForm(forms.Form):
+    content = forms.CharField(
+        label='内容',
+    )

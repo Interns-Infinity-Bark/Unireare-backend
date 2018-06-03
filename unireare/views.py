@@ -544,8 +544,8 @@ def note_list(request):
         if len(subjects) == 0:
             return ajax('error', '科目不存在')
         notes = notes.filter(subject=subjects[0])
-    if request.GET.get('name'):
-        notes = notes.filter(name__icontains=request.GET.get('name'))
+    if request.GET.get('title'):
+        notes = notes.filter(title__icontains=request.GET.get('title'))
     if request.GET.get('user'):
         users = User.objects.filter(pk=request.GET.get('user'))
         if len(users) == 0:
@@ -579,8 +579,8 @@ def draft_list(request):
         if len(subjects) == 0:
             return ajax('error', '科目不存在')
         notes = notes.filter(subject=subjects[0])
-    if request.GET.get('name'):
-        notes = notes.filter(name__icontains=request.GET.get('name'))
+    if request.GET.get('title'):
+        notes = notes.filter(title__icontains=request.GET.get('title'))
     if request.GET.get('page'):
         try:
             page = int(request.GET.get('page'))
@@ -692,8 +692,12 @@ def add_comment(request):
     form = AddCommentForm(request.POST)
     if form.is_valid():
         notes = Note.objects.filter(pk=form.cleaned_data['note'], is_draft=False, defunct=False)
-        if len(notes) == 0:
+        if len(notes) == 0 or notes[0].subject.defunct:
             return ajax('error', '笔记不存在')
+        if not notes[0].is_free and not request.user.is_superuser:
+            purchases = Purchased.objects.filter(user=request.user, note=notes[0])
+            if len(purchases) == 0:
+                return ajax('error', '无权访问该页面')
         comment = Comment(user=request.user, note=notes[0], content=form.cleaned_data['content'])
         if form.cleaned_data['upp_comment'] and form.cleaned_data['rep_comment']:
             upp_comments = Comment.objects.filter(pk=form.cleaned_data['upp_comment'], note=notes[0],
@@ -713,5 +717,23 @@ def add_comment(request):
         notes[0].save()
         comment.save()
         return ajax('success', '评论成功')
+    else:
+        return ajax('error', '', form.errors.get_json_data())
+
+
+def modify_comment(request, pk):
+    if not request.user.is_authenticated:
+        return ajax('error', '请先登录')
+    form = ModifyCommentForm(request.POST)
+    if form.is_valid():
+        comments = Comment.objects.filter(pk=pk, defunct=False)
+        if len(comments) == 0 or comments[0].note.defunct or (
+                comments[0].upp_comment and comments[0].upp_comment.defunct) or comments[0].note.subject.defunct:
+            return ajax('error', '评论不存在')
+        if comments[0].user != request.user and not request.user.is_superuser:
+            return ajax('error', '无权访问该页面')
+        comments[0].content = form.cleaned_data['content']
+        comments[0].save()
+        return ajax('success', '修改成功')
     else:
         return ajax('error', '', form.errors.get_json_data())

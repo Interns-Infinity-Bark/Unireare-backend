@@ -173,6 +173,7 @@ class Note(models.Model):
     def to_dict(self, lite=True):
         if lite:
             return {
+                'id': self.id,
                 'user': self.user.to_dict(),
                 'subject': self.subject.to_dict(),
                 'title': self.title,
@@ -189,6 +190,7 @@ class Note(models.Model):
                 'last_updated_at': self.last_updated_at.strftime("%Y-%m-%d %H:%M:%S")
             }
         return {
+            'id': self.id,
             'user': self.user.to_dict(),
             'subject': self.subject.to_dict(),
             'title': self.title,
@@ -219,7 +221,9 @@ class Comment(models.Model):
 
     def to_dict(self):
         return {
+            'id': self.id,
             'user': self.user.to_dict(),
+            'note': self.note.id,
             'upp_comment': self.upp_comment.id if self.upp_comment else 0,
             'rep_comment': self.rep_comment.id if self.rep_comment else 0,
             'content': self.content,
